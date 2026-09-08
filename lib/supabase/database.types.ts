@@ -6,6 +6,13 @@ export type FeedingRow = {
   fed_by: string | null;
 };
 
+export type MessageRow = {
+  id: string;
+  created_at: string;
+  name: string;
+  message: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -24,6 +31,22 @@ export type Database = {
           amount?: number;
           status?: string;
           fed_by?: string | null;
+        };
+        Relationships: [];
+      };
+      messages: {
+        Row: MessageRow;
+        Insert: {
+          id?: string;
+          created_at?: string;
+          name: string;
+          message: string;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          name?: string;
+          message?: string;
         };
         Relationships: [];
       };

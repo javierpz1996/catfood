@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Feed My Cat",
+  title: "MisCroquetitas",
   description: "Alimentá a mi gato con un toque.",
 };
 

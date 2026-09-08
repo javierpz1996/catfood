@@ -20,13 +20,14 @@ export async function listFeedings(
 
 export async function insertFeeding(
   supabase: SupabaseClient<Database>,
+  fedBy: string,
 ): Promise<FeedingRow> {
   const { data, error } = await supabase
     .from("feedings")
     .insert({
       amount: 1,
       status: "pending",
-      fed_by: "Anónimo",
+      fed_by: fedBy,
     })
     .select(feedingColumns)
     .single();
