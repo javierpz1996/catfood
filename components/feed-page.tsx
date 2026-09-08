@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FeedButton } from "@/components/feed-button";
 import { FeedHome } from "@/components/feed-home";
 import { LiveChat } from "@/components/live-chat";
@@ -11,8 +12,15 @@ export function FeedPage() {
 
   return (
     <div className="flex h-dvh flex-1 flex-col overflow-hidden bg-[#0e0e10] text-[#efeff1]">
-      <header className="flex h-12 shrink-0 items-center border-b border-[#2f2f35] bg-[#18181b] px-4">
-        <span className="text-lg font-bold text-[#3b82f6]">MisCroquetitas</span>
+      <header className="flex h-20 shrink-0 items-center border-b border-[#2f2f35] bg-black px-4">
+        <Image
+          src="/images/logo1.png"
+          alt="MisCroquetitas"
+          width={280}
+          height={72}
+          className="h-16 w-auto object-contain"
+          priority
+        />
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
