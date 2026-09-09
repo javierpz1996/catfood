@@ -1,4 +1,4 @@
-import { formatFeedingStatusLabel, formatFeedingWhen, formatPortionLabel } from "@/lib/feeding";
+import { formatFeedingStatusLabel, formatFeedingWhen, formatPortionLabel, isPlateCleanRecord } from "@/lib/feeding";
 import type { FeedingRow } from "@/lib/supabase/database.types";
 
 type FeedingHistoryProps = {
@@ -45,22 +45,27 @@ export function FeedingHistory({
         <ul className="max-h-40 space-y-1.5 overflow-y-auto pr-1">
           {visible.map((record, index) => {
             const isLatest = index === 0;
+            const isPlateClean = isPlateCleanRecord(record.status);
             const fedBy = record.fed_by?.trim() || "—";
 
+            let cardClass = "border border-[#2f2f35] bg-[#1f1f23]";
+            if (isPlateClean) {
+              cardClass = isLatest
+                ? `border-2 border-[#eb0400] bg-[#3d0f0f] shadow-[0_0_12px_rgba(235,4,0,0.5)] ${
+                    record.id === newestId ? "animate-feed-in" : ""
+                  }`
+                : "border-2 border-[#eb0400] bg-[#3d0f0f]";
+            } else if (isLatest) {
+              cardClass = `border-2 border-[#3b82f6] bg-[#1e3a5f] shadow-[0_0_12px_rgba(59,130,246,0.45)] ${
+                record.id === newestId ? "animate-feed-in" : ""
+              }`;
+            }
+
             return (
-              <li
-                key={record.id}
-                className={`rounded-md px-2 py-1.5 ${
-                  isLatest
-                    ? `border-2 border-[#3b82f6] bg-[#1e3a5f] shadow-[0_0_12px_rgba(59,130,246,0.45)] ${
-                        record.id === newestId ? "animate-feed-in" : ""
-                      }`
-                    : "border border-[#2f2f35] bg-[#1f1f23]"
-                }`}
-              >
+              <li key={record.id} className={`rounded-md px-2 py-1.5 ${cardClass}`}>
                 <div className="flex items-center gap-2">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#18181b] text-xs">
-                    🍗
+                    {isPlateClean ? "🧼" : "🍗"}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium leading-4 text-[#efeff1]">
@@ -71,7 +76,7 @@ export function FeedingHistory({
                     </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-[#18181b] px-2 py-0.5 text-[11px] font-bold text-[#efeff1]">
-                    {formatPortionLabel(record.amount)}
+                    {formatPortionLabel(record.amount, record.status)}
                   </span>
                 </div>
               </li>

@@ -39,6 +39,27 @@ export async function insertFeeding(
   return data;
 }
 
+export async function insertPlateClean(
+  supabase: SupabaseClient<Database>,
+  fedBy: string,
+): Promise<FeedingRow> {
+  const { data, error } = await supabase
+    .from("feedings")
+    .insert({
+      amount: 0,
+      status: "plate_clean",
+      fed_by: fedBy,
+    })
+    .select(feedingColumns)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export function sortFeedingsByNewest(records: FeedingRow[]): FeedingRow[] {
   return [...records].sort(
     (a, b) =>

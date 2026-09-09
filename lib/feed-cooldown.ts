@@ -1,8 +1,10 @@
 const FIRST_VISIT_KEY = "cat_feeder_first_visit";
 const LAST_FEED_KEY = "cat_feeder_last_feed";
+const LAST_PLATE_CLEAN_KEY = "cat_feeder_last_plate_clean";
 
 export const FIRST_VISIT_COOLDOWN_MS = 60_000;
 export const LAST_FEED_COOLDOWN_MS = 5 * 60_000;
+export const PLATE_CLEAN_COOLDOWN_MS = 40 * 60_000;
 
 export type CooldownKind = "first_visit" | "last_feed";
 
@@ -66,4 +68,19 @@ export function cooldownMessage(state: CooldownState) {
   }
 
   return `Próxima alimentación disponible en ${time}`;
+}
+
+export function saveLastPlateCleanTimestamp(now = Date.now()) {
+  window.localStorage.setItem(LAST_PLATE_CLEAN_KEY, String(now));
+}
+
+export function getPlateCleanRemainingMs(now = Date.now()) {
+  const lastClean = readTimestamp(LAST_PLATE_CLEAN_KEY);
+  if (!lastClean) return 0;
+  return Math.max(0, lastClean + PLATE_CLEAN_COOLDOWN_MS - now);
+}
+
+export function plateCleanCooldownMessage(remainingMs: number) {
+  if (remainingMs <= 0) return null;
+  return `Próxima limpieza en ${formatCountdown(remainingMs)}`;
 }

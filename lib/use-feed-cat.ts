@@ -5,11 +5,14 @@ import { getOrCreateChatUsername } from "@/lib/chat-username";
 import {
   cooldownMessage,
   getCooldownState,
+  getPlateCleanRemainingMs,
   saveLastFeedTimestamp,
+  saveLastPlateCleanTimestamp,
   type CooldownState,
 } from "@/lib/feed-cooldown";
 import {
   insertFeeding,
+  insertPlateClean,
   listFeedings,
   upsertFeeding,
 } from "@/lib/feedings";
@@ -18,11 +21,27 @@ import type { FeedingRow } from "@/lib/supabase/database.types";
 
 const SUCCESS_MS = 2800;
 
-export function useFeedCat() {
+export type FeedCatState = {
+  records: FeedingRow[];
+  isLoading: boolean;
+  isSaving: boolean;
+  isCleaning: boolean;
+  showSuccess: boolean;
+  errorMessage: string | null;
+  newestId: string | null;
+  cooldown: CooldownState | null;
+  isButtonDisabled: boolean;
+  handleFeed: () => Promise<void>;
+  handlePlateClean: () => Promise<void>;
+  cooldownLabel: string | null;
+};
+
+export function useFeedCat(): FeedCatState {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [records, setRecords] = useState<FeedingRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCleaning, setIsCleaning] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [newestId, setNewestId] = useState<string | null>(null);
@@ -95,7 +114,7 @@ export function useFeedCat() {
   }, []);
 
   async function handleFeed() {
-    if (isSaving) return;
+    if (isSaving || isCleaning) return;
     if (getCooldownState().remainingMs > 0) return;
 
     setIsSaving(true);
@@ -127,19 +146,44 @@ export function useFeedCat() {
     }
   }
 
+  async function handlePlateClean() {
+    if (isSaving || isCleaning) return;
+    if (getPlateCleanRemainingMs() > 0) return;
+
+    setIsCleaning(true);
+    setErrorMessage(null);
+
+    try {
+      const next = await insertPlateClean(supabase, getOrCreateChatUsername());
+      saveLastPlateCleanTimestamp();
+      setRecords((current) => upsertFeeding(current, next));
+      setNewestId(next.id);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "No se pudo registrar la limpieza.",
+      );
+    } finally {
+      setIsCleaning(false);
+    }
+  }
+
   const isButtonDisabled =
-    isSaving || cooldown === null || cooldown.remainingMs > 0;
+    isSaving || isCleaning || cooldown === null || cooldown.remainingMs > 0;
 
   return {
     records,
     isLoading,
     isSaving,
+    isCleaning,
     showSuccess,
     errorMessage,
     newestId,
     cooldown,
     isButtonDisabled,
     handleFeed,
+    handlePlateClean,
     cooldownLabel:
       cooldown && cooldown.remainingMs > 0 ? cooldownMessage(cooldown) : null,
   };

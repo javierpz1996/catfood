@@ -23,7 +23,8 @@ export function formatFeedingWhen(value: string | Date, now = new Date()) {
   });
 }
 
-export function formatPortionLabel(amount: number) {
+export function formatPortionLabel(amount: number, status?: string) {
+  if (status === "plate_clean" || amount === 0) return "Limpieza";
   return amount === 1 ? "1 porción" : `${amount} porciones`;
 }
 
@@ -35,9 +36,15 @@ export function formatFeedingStatusLabel(status: string) {
       return "Alimentado correctamente";
     case "failed":
       return "No se pudo alimentar";
+    case "plate_clean":
+      return "Limpieza de plato";
     default:
       return status;
   }
+}
+
+export function isPlateCleanRecord(status: string) {
+  return status === "plate_clean";
 }
 
 function pad(value: number) {
