@@ -12,13 +12,13 @@ export function FeedPage() {
 
   return (
     <div className="flex h-dvh flex-1 flex-col overflow-hidden bg-[#0e0e10] text-[#efeff1]">
-      <header className="flex h-20 shrink-0 items-center border-b border-[#2f2f35] bg-black px-4">
+      <header className="flex h-[4.5rem] shrink-0 items-center border-b border-[#2f2f35] bg-black px-4">
         <Image
           src="/images/logo1.png"
           alt="MisCroquetitas"
-          width={280}
-          height={72}
-          className="h-16 w-auto object-contain"
+          width={240}
+          height={60}
+          className="h-14 w-auto object-contain"
           priority
         />
       </header>
