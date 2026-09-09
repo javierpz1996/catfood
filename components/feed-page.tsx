@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { FeedButton } from "@/components/feed-button";
 import { FeedHome } from "@/components/feed-home";
@@ -9,6 +10,7 @@ import { useFeedCat } from "@/lib/use-feed-cat";
 
 export function FeedPage() {
   const feed = useFeedCat();
+  const [isLive, setIsLive] = useState(false);
 
   return (
     <div className="flex h-dvh flex-1 flex-col overflow-hidden bg-[#0e0e10] text-[#efeff1]">
@@ -25,9 +27,17 @@ export function FeedPage() {
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <TwitchPlayer
+          onLiveChange={setIsLive}
           bar={
             <div className="flex flex-col gap-2">
-              {feed.cooldownLabel ? (
+              {!isLive ? (
+                <FeedButton
+                  disabled
+                  unavailable
+                  feeding={false}
+                  onFeed={() => undefined}
+                />
+              ) : feed.cooldownLabel ? (
                 <p className="w-full rounded-md bg-[#eb0400] px-6 py-3 text-center text-sm font-semibold text-white">
                   ⏱️ {feed.cooldownLabel}
                 </p>

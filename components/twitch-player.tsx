@@ -36,6 +36,7 @@ declare global {
 
 type TwitchPlayerProps = {
   bar: ReactNode;
+  onLiveChange?: (isLive: boolean) => void;
 };
 
 function loadTwitchEmbedScript() {
@@ -65,13 +66,21 @@ function loadTwitchEmbedScript() {
   });
 }
 
-export function TwitchPlayer({ bar }: TwitchPlayerProps) {
+export function TwitchPlayer({ bar, onLiveChange }: TwitchPlayerProps) {
   const embedId = "miscroquetitas-twitch-player";
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLive, setIsLive] = useState(false);
+  const onLiveChangeRef = useRef(onLiveChange);
+  onLiveChangeRef.current = onLiveChange;
 
   useEffect(() => {
     let cancelled = false;
+
+    function updateLive(next: boolean) {
+      if (cancelled) return;
+      setIsLive(next);
+      onLiveChangeRef.current?.(next);
+    }
 
     async function setup() {
       try {
@@ -95,13 +104,13 @@ export function TwitchPlayer({ bar }: TwitchPlayerProps) {
         });
 
         player.addEventListener(window.Twitch.Player.ONLINE, () => {
-          if (!cancelled) setIsLive(true);
+          updateLive(true);
         });
         player.addEventListener(window.Twitch.Player.OFFLINE, () => {
-          if (!cancelled) setIsLive(false);
+          updateLive(false);
         });
       } catch {
-        if (!cancelled) setIsLive(false);
+        updateLive(false);
       }
     }
 
