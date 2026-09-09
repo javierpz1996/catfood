@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-const CHANNEL = "croquetitas24";
+const CHANNEL = "croquetitas25";
 const EMBED_SCRIPT = "https://player.twitch.tv/js/embed/v1.js";
 
 type TwitchPlayerInstance = {
